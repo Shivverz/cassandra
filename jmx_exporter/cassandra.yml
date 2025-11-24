@@ -1,0 +1,36 @@
+startDelaySeconds: 0
+ssl: false
+whitelistObjectNames:
+  - "org.apache.cassandra.metrics:*"
+  - "java.lang:type=Memory,*"
+  - "java.lang:type=GarbageCollector,*"
+  - "java.lang:type=Threading"
+
+rules:
+  # Simple Cassandra metrics (no scope)
+  - pattern: 'org.apache.cassandra.metrics<type=(.*), name=(.*)><>Count'
+    name: cassandra_$1_count
+    labels:
+      metric: "$2"
+    type: COUNTER
+
+  - pattern: 'org.apache.cassandra.metrics<type=(.*), name=(.*)><>Value'
+    name: cassandra_$1_value
+    labels:
+      metric: "$2"
+    type: GAUGE
+
+  # Cassandra metrics with scope (e.g. by keyspace/table/node)
+  - pattern: 'org.apache.cassandra.metrics<type=(.*), scope=(.*), name=(.*)><>Count'
+    name: cassandra_$1_count
+    labels:
+      scope: "$2"
+      metric: "$3"
+    type: COUNTER
+
+  - pattern: 'org.apache.cassandra.metrics<type=(.*), scope=(.*), name=(.*)><>Value'
+    name: cassandra_$1_value
+    labels:
+      scope: "$2"
+      metric: "$3"
+    type: GAUGE
